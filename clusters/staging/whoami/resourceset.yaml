@@ -1,0 +1,30 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: whoami
+spec:
+  inputsFrom:
+    - apiVersion: fluxcd.controlplane.io/v1
+      kind: ResourceSetInputProvider
+      name: whoami
+  resources:
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: whoami-<< inputs.id >>
+        namespace: whoami-preview
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: whoami-<< inputs.id >>
+        template:
+          metadata:
+            labels:
+              app: whoami-<< inputs.id >>
+          spec:
+            containers:
+              - name: whoami
+                image: traefik/whoami
+                ports:
+                  - containerPort: 80
